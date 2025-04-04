@@ -1,16 +1,16 @@
 import 'dart:convert';
+import 'package:frontend/services/auth_service.dart';
 import 'package:http/http.dart' as http;
-// import 'package:frontend/utils/constants.dart';
 
 class ApiService {
-  final String? token;
+  final AuthService authService;
 
-  ApiService({this.token});
+  ApiService({required this.authService});
 
   Future<http.Response> get(String url) async {
     return await http.get(
       Uri.parse(url),
-      headers: _getHeaders(),
+      headers: await _getHeaders(),
     );
   }
 
@@ -18,7 +18,7 @@ class ApiService {
     return await http.post(
       Uri.parse(url),
       body: jsonEncode(body),
-      headers: _getHeaders(),
+      headers: await _getHeaders(),
     );
   }
 
@@ -26,23 +26,24 @@ class ApiService {
     return await http.put(
       Uri.parse(url),
       body: jsonEncode(body),
-      headers: _getHeaders(),
+      headers: await _getHeaders(),
     );
   }
 
   Future<http.Response> delete(String url) async {
     return await http.delete(
       Uri.parse(url),
-      headers: _getHeaders(),
+      headers: await _getHeaders(),
     );
   }
 
-  Map<String, String> _getHeaders() {
+  Future<Map<String, String>> _getHeaders() async {
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
 
+    String? token = await authService.getToken(); // Get the token from AuthService
     if (token != null) {
       headers['Authorization'] = 'Bearer $token';
     }

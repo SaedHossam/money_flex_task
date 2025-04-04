@@ -13,12 +13,12 @@ void main() async {
   
   final authService = AuthService();
   final token = await authService.getToken();
-  final apiService = ApiService(token: token);
+  final apiService = ApiService(authService: authService);
   
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider(authService: authService, apiService: apiService)),
         ChangeNotifierProvider(create: (_) => CustomerProvider(apiService)),
       ],
       child: MyApp(apiService: apiService, isLoggedIn: token != null),

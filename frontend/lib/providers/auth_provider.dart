@@ -7,8 +7,10 @@ import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/utils/constants.dart';
 
 class AuthProvider with ChangeNotifier {
-  final AuthService _authService = AuthService();
-  final ApiService _apiService = ApiService();
+  final AuthService authService;
+  final ApiService apiService;
+
+  AuthProvider({required this.authService, required this.apiService});
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -21,11 +23,11 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _apiService.post(ApiConstants.loginUrl, user.toJson());
+      final response = await apiService.post(ApiConstants.loginUrl, user.toJson());
       
       if (response.statusCode == 200) {
         final token = jsonDecode(response.body)['access_token'];
-        await _authService.saveToken(token);
+        await authService.saveToken(token);
         _errorMessage = null;
         return true;
       } else {
@@ -42,7 +44,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await _authService.deleteToken();
+    await authService.deleteToken();
     notifyListeners();
   }
 }
